@@ -20,6 +20,17 @@ export async function POST(request: Request) {
 
     if (error) {
       console.error(error);
+
+      if (error.code === "over_email_send_rate_limit") {
+        return NextResponse.json(
+          {
+            error:
+              "Limite de emails atingido. Aguarde cerca de 1 hora e tente novamente.",
+          },
+          { status: 429 },
+        );
+      }
+
       return NextResponse.json(
         { error: "Não foi possível enviar o email. Verifique o endereço." },
         { status: 400 },
