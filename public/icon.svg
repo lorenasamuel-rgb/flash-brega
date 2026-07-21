@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#1a0a2e"/>
+  <text x="256" y="200" text-anchor="middle" font-size="120" fill="#ec4899">=ø</text>
+  <text x="256" y="340" text-anchor="middle" font-family="Arial,sans-serif" font-size="48" font-weight="bold" fill="#fbbf24">FLASH</text>
+  <text x="256" y="400" text-anchor="middle" font-family="Arial,sans-serif" font-size="36" fill="#c084fc">BREGA</text>
+</svg>

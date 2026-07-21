@@ -1,36 +1,74 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Flash Brega
 
-## Getting Started
+PWA de engajamento para festa brega: caça humano com autenticação por música + foto, feed ao vivo e painel para telão.
 
-First, run the development server:
+**Tagline:** Acha, autentica, flash — aparece no telão
+
+## Setup rápido (antes da festa)
+
+### 1. Supabase
+
+1. Crie um projeto em [supabase.com](https://supabase.com)
+2. No SQL Editor, rode o arquivo `supabase/migrations/001_initial.sql`
+3. Em Storage, crie bucket **`photos`** (público)
+4. Copie URL e keys para `.env.local`
+
+### 2. App
 
 ```bash
+cp .env.local.example .env.local
+# Edite .env.local com suas credenciais
+
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abra [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 3. Deploy (Vercel)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npx vercel
+```
 
-## Learn More
+Configure as mesmas env vars no painel da Vercel.
 
-To learn more about Next.js, take a look at the following resources:
+## Fluxo do evento
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. **Entrada:** QR code apontando para `/e/BREGA2026`
+2. **Cadastro:** apelido + PIN 4 dígitos → recebe música brega
+3. **Admin:** em `/admin`, gerar missões quando tiver participantes
+4. **Telão:** notebook em `/live?event=BREGA2026` fullscreen
+5. **Fim:** admin congela ranking → anuncia top caçador e top caçado
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Fluxo da missão
 
-## Deploy on Vercel
+1. Caçador encontra alvo → **Encontrei!**
+2. Caçador diz sua música → alvo **confirma música**
+3. Caçador **tira foto** → alvo **confirma foto**
+4. Legenda brega gerada → feed + telão + pontos no ranking
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## URLs importantes
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| URL | Uso |
+|-----|-----|
+| `/e/BREGA2026` | Entrada do evento (QR) |
+| `/live?event=BREGA2026` | Painel telão |
+| `/admin` | Organizador |
+
+## Checklist pré-festa
+
+- [ ] Migration SQL executada no Supabase
+- [ ] Bucket `photos` criado (público)
+- [ ] `.env.local` / Vercel env vars configuradas
+- [ ] Teste com 2 celulares (fluxo completo)
+- [ ] QR code impresso na entrada
+- [ ] Notebook conectado ao projetor em `/live`
+- [ ] Senha admin anotada para organizador
+
+## Stack
+
+- Next.js 16 (App Router)
+- Supabase (Postgres + Storage + Realtime via polling)
+- Tailwind CSS 4
+- Deploy: Vercel
