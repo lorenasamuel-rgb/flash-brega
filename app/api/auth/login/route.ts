@@ -1,55 +1,55 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
 import { normalizeSong } from "@/lib/supabase/helpers";
-import { setSession, verifyPin } from "@/lib/auth";
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { eventCode, nickname, pin } = body;
+    const { email, password } = body;
 
-    if (!eventCode || !nickname || !pin) {
+    if (!email || !password) {
       return NextResponse.json(
-        { error: "Evento, apelido e PIN são obrigatórios" },
+        { error: "Email e senha são obrigatórios" },
         { status: 400 },
       );
     }
 
-    const supabase = createAdminClient();
+    const supabase = await createClient();
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email: email.toLowerCase().trim(),
+      password,
+    });
 
-    const { data: event } = await supabase
-      .from("events")
-      .select("id")
-      .eq("code", eventCode.toUpperCase())
-      .single();
-
-    if (!event) {
-      return NextResponse.json({ error: "Evento não encontrado" }, { status: 404 });
+    if (signInError) {
+      return NextResponse.json(
+        { error: "Email ou senha incorretos" },
+        { status: 401 },
+      );
     }
 
-    const { data: participant } = await supabase
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return NextResponse.json({ error: "Erro ao entrar" }, { status: 401 });
+    }
+
+    const admin = createAdminClient();
+    const { data: participant } = await admin
       .from("participants")
-      .select("id, pin_hash, nickname, songs(title, artist)")
-      .eq("event_id", event.id)
-      .eq("nickname", nickname.trim())
+      .select("id, nickname, songs(title, artist)")
+      .eq("auth_user_id", user.id)
       .single();
 
     if (!participant) {
+      await supabase.auth.signOut();
       return NextResponse.json(
-        { error: "Apelido ou PIN incorretos" },
-        { status: 401 },
+        { error: "Conta sem perfil na festa. Complete o cadastro." },
+        { status: 404 },
       );
     }
-
-    const valid = await verifyPin(pin, participant.pin_hash);
-    if (!valid) {
-      return NextResponse.json(
-        { error: "Apelido ou PIN incorretos" },
-        { status: 401 },
-      );
-    }
-
-    await setSession(participant.id);
 
     const songs = normalizeSong(participant.songs);
 

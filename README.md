@@ -9,9 +9,9 @@ PWA de engajamento para festa brega: caça humano com autenticação por música
 ### 1. Supabase
 
 1. Crie um projeto em [supabase.com](https://supabase.com)
-2. No SQL Editor, rode o arquivo `supabase/migrations/001_initial.sql`
-3. Em Storage, crie bucket **`photos`** (público)
-4. Copie URL e keys para `.env.local`
+2. No SQL Editor, rode as migrations em ordem (`001` → `002` → `003` → `004_auth`) ou use `supabase/setup-completo.sql`
+3. **Authentication** → Email habilitado; redirect URLs: `/auth/callback` (prod + localhost)
+4. Copie URL e keys + `NEXT_PUBLIC_SITE_URL` para `.env.local`
 
 ### 2. App
 
@@ -36,10 +36,11 @@ Configure as mesmas env vars no painel da Vercel.
 ## Fluxo do evento
 
 1. **Entrada:** QR code apontando para `/e/BREGA2026`
-2. **Cadastro:** apelido + PIN 4 dígitos → recebe música brega
-3. **Admin:** em `/admin`, gerar missões quando tiver participantes
-4. **Telão:** notebook em `/live?event=BREGA2026` fullscreen
-5. **Fim:** admin congela ranking → anuncia top caçador e top caçado
+2. **Cadastro:** email + senha + apelido + selfie → recebe música brega
+3. **Login / recuperação:** `/login` e `/recuperar-senha`
+4. **Admin:** em `/admin`, gerar missões quando tiver participantes
+5. **Telão:** notebook em `/live?event=BREGA2026` fullscreen
+6. **Fim:** admin congela ranking → anuncia top caçador e top caçado
 
 ## Fluxo da missão
 
@@ -54,11 +55,15 @@ Configure as mesmas env vars no painel da Vercel.
 |-----|-----|
 | `/e/BREGA2026` | Entrada do evento (QR) |
 | `/live?event=BREGA2026` | Painel telão |
+| `/login` | Entrada (já cadastrado) |
+| `/recuperar-senha` | Redefinir senha por email |
 | `/admin` | Organizador |
 
 ## Checklist pré-festa
 
-- [ ] Migration SQL executada no Supabase
+- [ ] Migrations SQL executadas (incl. `004_auth.sql`)
+- [ ] Supabase Auth: Email + redirect URLs configurados
+- [ ] `NEXT_PUBLIC_SITE_URL` no `.env.local` e Vercel
 - [ ] Bucket `photos` criado (público)
 - [ ] `.env.local` / Vercel env vars configuradas
 - [ ] Teste com 2 celulares (fluxo completo)

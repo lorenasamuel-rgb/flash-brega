@@ -25,10 +25,11 @@ create table if not exists participants (
   id uuid primary key default gen_random_uuid(),
   event_id uuid references events(id) on delete cascade not null,
   nickname text not null,
-  pin_hash text not null,
+  pin_hash text,
   song_id uuid references songs(id),
   opt_in_public boolean default true,
   avatar_url text,
+  auth_user_id uuid unique references auth.users(id) on delete cascade,
   created_at timestamptz default now(),
   unique(event_id, nickname)
 );
@@ -119,3 +120,9 @@ drop policy if exists "Fotos publicas leitura" on storage.objects;
 create policy "Fotos publicas leitura"
 on storage.objects for select
 using (bucket_id = 'photos');
+
+-- ========== PARTE 3: AUTH (SUPABASE) ==========
+
+alter table participants add column if not exists auth_user_id uuid unique references auth.users(id) on delete cascade;
+alter table participants alter column pin_hash drop not null;
+create index if not exists idx_participants_auth_user on participants(auth_user_id);

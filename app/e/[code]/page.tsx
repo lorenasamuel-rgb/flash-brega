@@ -37,7 +37,7 @@ export default function EventEntryPage() {
       <p className="text-sm uppercase text-pink-400">{code}</p>
       <h1 className="mt-2 text-3xl font-black text-white">{eventName}</h1>
       <p className="mt-4 text-purple-200">
-        Cadastre-se ou entre com seu apelido e PIN
+        Cadastre-se ou entre com email e senha
       </p>
       <div className="mt-8 flex w-full max-w-xs flex-col gap-3">
         <Link

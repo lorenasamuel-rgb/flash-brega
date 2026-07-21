@@ -9,8 +9,9 @@ function CadastroForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const eventCode = searchParams.get("event") ?? "BREGA2026";
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [nickname, setNickname] = useState("");
-  const [pin, setPin] = useState("");
   const [optIn, setOptIn] = useState(true);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
@@ -27,13 +28,19 @@ function CadastroForm() {
       return;
     }
 
+    if (password.length < 6) {
+      setError("Senha deve ter pelo menos 6 caracteres");
+      return;
+    }
+
     setLoading(true);
     setError("");
 
     const form = new FormData();
     form.append("eventCode", eventCode);
+    form.append("email", email);
+    form.append("password", password);
     form.append("nickname", nickname);
-    form.append("pin", pin);
     form.append("optInPublic", String(optIn));
     form.append("photo", photoFile);
 
@@ -72,10 +79,32 @@ function CadastroForm() {
         <label className="mb-2 block text-sm font-bold text-pink-300">
           Sua foto (para te reconhecerem)
         </label>
-        <p className="mb-3 text-xs text-purple-400">
-          Selfie clara do rosto — quem te caçar vai ver esta foto na missão
-        </p>
         <PhotoCapture onCapture={setPhotoFile} disabled={loading} facing="user" />
+      </div>
+      <div>
+        <label className="mb-1 block text-sm text-purple-300">Email</label>
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          autoComplete="email"
+          className="w-full rounded-xl border border-purple-500/40 bg-purple-950/50 px-4 py-3 text-white outline-none focus:border-pink-400"
+        />
+      </div>
+      <div>
+        <label className="mb-1 block text-sm text-purple-300">
+          Senha (mín. 6 caracteres)
+        </label>
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          minLength={6}
+          autoComplete="new-password"
+          className="w-full rounded-xl border border-purple-500/40 bg-purple-950/50 px-4 py-3 text-white outline-none focus:border-pink-400"
+        />
       </div>
       <div>
         <label className="mb-1 block text-sm text-purple-300">
@@ -89,20 +118,6 @@ function CadastroForm() {
           maxLength={30}
           className="w-full rounded-xl border border-purple-500/40 bg-purple-950/50 px-4 py-3 text-white outline-none focus:border-pink-400"
           placeholder="Rainha do Sertanejo"
-        />
-      </div>
-      <div>
-        <label className="mb-1 block text-sm text-purple-300">
-          PIN (4 dígitos)
-        </label>
-        <input
-          value={pin}
-          onChange={(e) => setPin(e.target.value.replace(/\D/g, "").slice(0, 4))}
-          required
-          pattern="\d{4}"
-          inputMode="numeric"
-          className="w-full rounded-xl border border-purple-500/40 bg-purple-950/50 px-4 py-3 text-white outline-none focus:border-pink-400"
-          placeholder="1234"
         />
       </div>
       <label className="flex items-center gap-2 text-sm text-purple-200">
@@ -126,7 +141,10 @@ function CadastroForm() {
       >
         {loading ? "Cadastrando..." : "Entrar na caçada"}
       </button>
-      <Link href={`/login?event=${eventCode}`} className="block text-center text-sm text-purple-400">
+      <Link
+        href={`/login?event=${eventCode}`}
+        className="block text-center text-sm text-purple-400"
+      >
         Já tenho conta
       </Link>
     </form>
@@ -138,7 +156,7 @@ export default function CadastroPage() {
     <main className="mx-auto min-h-screen max-w-md px-6 py-12">
       <h1 className="text-center text-2xl font-black text-white">Cadastro</h1>
       <p className="mt-2 text-center text-sm text-purple-300">
-        Foto + apelido + PIN — pronto para a caçada
+        Foto + email + senha + apelido brega
       </p>
       <div className="mt-8">
         <Suspense>

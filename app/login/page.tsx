@@ -8,10 +8,13 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const eventCode = searchParams.get("event") ?? "BREGA2026";
-  const [nickname, setNickname] = useState("");
-  const [pin, setPin] = useState("");
+  const authError = searchParams.get("error");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(
+    authError === "auth" ? "Link expirado ou inválido. Tente novamente." : "",
+  );
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -21,7 +24,7 @@ function LoginForm() {
     const res = await fetch("/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ eventCode, nickname, pin }),
+      body: JSON.stringify({ email, password }),
     });
 
     const data = await res.json();
@@ -37,22 +40,25 @@ function LoginForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className="mb-1 block text-sm text-purple-300">Apelido</label>
+        <label className="mb-1 block text-sm text-purple-300">Email</label>
         <input
-          value={nickname}
-          onChange={(e) => setNickname(e.target.value)}
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           required
+          autoComplete="email"
           className="w-full rounded-xl border border-purple-500/40 bg-purple-950/50 px-4 py-3 text-white outline-none focus:border-pink-400"
         />
       </div>
       <div>
-        <label className="mb-1 block text-sm text-purple-300">PIN</label>
+        <label className="mb-1 block text-sm text-purple-300">Senha</label>
         <input
-          value={pin}
-          onChange={(e) => setPin(e.target.value.replace(/\D/g, "").slice(0, 4))}
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
           required
-          pattern="\d{4}"
-          inputMode="numeric"
+          minLength={6}
+          autoComplete="current-password"
           className="w-full rounded-xl border border-purple-500/40 bg-purple-950/50 px-4 py-3 text-white outline-none focus:border-pink-400"
         />
       </div>
@@ -69,6 +75,12 @@ function LoginForm() {
         {loading ? "Entrando..." : "Entrar"}
       </button>
       <Link
+        href={`/recuperar-senha?event=${eventCode}`}
+        className="block text-center text-sm text-yellow-300"
+      >
+        Esqueci minha senha
+      </Link>
+      <Link
         href={`/cadastro?event=${eventCode}`}
         className="block text-center text-sm text-purple-400"
       >
@@ -82,6 +94,9 @@ export default function LoginPage() {
   return (
     <main className="mx-auto min-h-screen max-w-md px-6 py-12">
       <h1 className="text-center text-2xl font-black text-white">Entrar</h1>
+      <p className="mt-2 text-center text-sm text-purple-300">
+        Email e senha da festa
+      </p>
       <div className="mt-8">
         <Suspense>
           <LoginForm />

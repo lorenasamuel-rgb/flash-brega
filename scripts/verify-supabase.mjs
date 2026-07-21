@@ -83,4 +83,16 @@ if (!photosBucket) {
 }
 console.log("✅ Bucket photos:", photosBucket.public ? "público" : "privado (deve ser público!)");
 
+const { error: authColError } = await supabase
+  .from("participants")
+  .select("auth_user_id")
+  .limit(1);
+
+if (authColError?.message?.includes("auth_user_id")) {
+  console.error("❌ Coluna auth_user_id ausente");
+  console.error("\n→ Rode supabase/migrations/004_auth.sql no SQL Editor");
+  process.exit(1);
+}
+console.log("✅ Auth migration (auth_user_id): OK");
+
 console.log("\n🎉 Supabase OK! Rode: npm run dev");

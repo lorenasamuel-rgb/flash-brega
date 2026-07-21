@@ -73,4 +73,5 @@ export interface SessionParticipant {
   song_artist: string;
   opt_in_public: boolean;
   avatar_url: string | null;
+  email?: string;
 }

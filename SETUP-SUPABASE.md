@@ -17,6 +17,18 @@
 2. Copie **todo** o conteúdo de `supabase/migrations/001_initial.sql`
 3. Clique **Run** — deve aparecer "Success"
 4. Nova query → copie `supabase/migrations/002_storage.sql` → **Run**
+5. Nova query → copie `supabase/migrations/003_avatar.sql` → **Run** (se ainda não rodou)
+6. Nova query → copie `supabase/migrations/004_auth.sql` → **Run**
+
+### Passo 2b — Configurar Supabase Auth
+
+1. **Authentication** → **Providers** → **Email** → habilitado
+2. **Authentication** → **URL Configuration**:
+   - **Site URL:** `https://flash-brega.vercel.app` (ou localhost em dev)
+   - **Redirect URLs** (adicione todas):
+     - `https://flash-brega.vercel.app/auth/callback`
+     - `http://localhost:3000/auth/callback`
+3. (Opcional) Desative **Confirm email** se quiser — o app já confirma email no cadastro via admin
 
 ### Conferir se deu certo
 
@@ -39,6 +51,7 @@ No **Storage**, deve aparecer bucket **`photos`** (público).
 | Project URL | `NEXT_PUBLIC_SUPABASE_URL` |
 | anon public | `NEXT_PUBLIC_SUPABASE_ANON_KEY` |
 | service_role (Reveal!) | `SUPABASE_SERVICE_ROLE_KEY` |
+| Site URL (recuperação senha) | `NEXT_PUBLIC_SITE_URL` |
 
 ⚠️ **Nunca** commite ou compartilhe a `service_role` — ela bypassa toda segurança.
 
@@ -58,6 +71,7 @@ Edite `.env.local` e cole suas chaves:
 NEXT_PUBLIC_SUPABASE_URL=https://xxxxxxxx.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbG...
 SUPABASE_SERVICE_ROLE_KEY=eyJhbG...
+NEXT_PUBLIC_SITE_URL=https://flash-brega.vercel.app
 ADMIN_PASSWORD=brega2026
 ```
 
@@ -81,7 +95,7 @@ Abra [http://localhost:3000/e/BREGA2026](http://localhost:3000/e/BREGA2026) e fa
 
 ## Passo 6 — Deploy (Vercel)
 
-No painel Vercel → Project → **Settings** → **Environment Variables**, adicione as **4 mesmas variáveis** do `.env.local`.
+No painel Vercel → Project → **Settings** → **Environment Variables**, adicione as **5 variáveis** do `.env.local` (incl. `NEXT_PUBLIC_SITE_URL`).
 
 ---
 
@@ -93,7 +107,8 @@ No painel Vercel → Project → **Settings** → **Environment Variables**, adi
 | `Bucket not found` / upload falha | Rode o `002_storage.sql` |
 | `Missing SUPABASE_SERVICE_ROLE_KEY` | Preencha `.env.local` e reinicie `npm run dev` |
 | Cadastro funciona, foto não sobe | Bucket `photos` deve ser **público** |
-| `Apelido já em uso` | Normal — use outro apelido ou apague em Table Editor → participants |
+| Cadastro falha após email | Rode `004_auth.sql` (coluna `auth_user_id`) |
+| Link de senha não funciona | Confira `NEXT_PUBLIC_SITE_URL` e redirect URLs no Supabase Auth |
 
 ---
 
