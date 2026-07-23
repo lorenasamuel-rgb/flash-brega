@@ -91,13 +91,13 @@ export async function POST(request: Request) {
     }
 
     const rawBuffer = Buffer.from(await file.arrayBuffer());
-    const { buffer, contentType, extension } =
+    const { blob, contentType, extension } =
       await compressImageBuffer(rawBuffer);
     const path = `${event.id}/avatars/${participant.id}.${extension}`;
 
     const { error: uploadError } = await admin.storage
       .from("photos")
-      .upload(path, buffer, { contentType, upsert: true });
+      .upload(path, blob, { contentType, upsert: true });
 
     if (uploadError) {
       await admin.from("participants").delete().eq("id", participant.id);

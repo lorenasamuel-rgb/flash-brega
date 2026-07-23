@@ -1,0 +1,190 @@
+---
+description: Diretrizes de UI/UX Flash Brega — marca Festa Brega retrô, mobile-first, telão e fluxos de missão
+globs: **/*.{tsx,css}
+alwaysApply: false
+---
+
+# Flash Brega — UI/UX
+
+## Marca
+
+Extensão digital da **Festa Brega in UK**. Estilo **retrô, vibrante e brasileiro** — música, nostalgia, alegria e diversão.
+
+Tom de voz: alegre, descontraído, nostálgico e divertido. Valorizar música, dança e reencontros.
+
+Tagline do app: **"Acha, autentica, flash — aparece no telão"**
+
+## Princípios
+
+- **Mobile-first**: thumb zone, botões grandes (min 48px), uma ação principal por tela
+- **Retrô brega**: bege quente, carmim vibrante, azul profundo — texturas e ícones vintage, nunca neon/cyberpunk
+- **Clareza na festa**: barulho, luz baixa, usuário distraído — texto legível, estados óbvios
+- **Foto é o herói**: avatares e flashes grandes e nítidos
+- **Feedback imediato**: loading, sucesso, erro e "aguardando outro" sempre visíveis
+- **Fluxo sequencial**: encontrei → música → foto → confirmação — mostrar progresso
+
+## Identidade visual
+
+### Paleta (obrigatória)
+
+| Token | Hex | Uso |
+|-------|-----|-----|
+| `--brega-bege` | `#FBE6C6` | fundo principal, cards claros, telão em modo claro |
+| `--brega-carmim` | `#D83055` | CTAs primários, títulos, caçador, destaques |
+| `--brega-azul` | `#003C8D` | subtítulos, nav ativa, ranking, links, telão |
+| `--brega-preto` | `#000000` | texto principal, contornos, sombras |
+| `--brega-bege-escuro` | `#E8CFA8` | bordas, separadores, hover sutil |
+| `--brega-carmim-claro` | `#F04D72` | hover em botões carmim |
+| `--brega-azul-claro` | `#1A5BB5` | hover em elementos azuis |
+
+**Semântica funcional** (derivada da paleta):
+- Sucesso: carmim + ícone ✓ (não verde genérico)
+- Aguardando: bege escuro + contorno azul tracejado
+- Erro: carmim escuro `#A82040` sobre bege
+- Caçador: carmim | Caçado/alvo: azul
+
+### Tipografia
+
+| Papel | Fonte | Uso |
+|-------|-------|-----|
+| Títulos / destaques | **Zing Rust Base Rough** | h1, h2, botões primários, logo, telão |
+| Subtítulos / corpo | **Contrail One** | labels, parágrafos, nav, formulários, legendas |
+
+```css
+/* globals.css — padrão alvo */
+--font-display: "Zing Rust Base Rough", "Contrail One", cursive;
+--font-body: "Contrail One", cursive;
+```
+
+- Zing Rust é fonte comercial — colocar em `/public/fonts/` ou usar fallback Contrail One em itálico/bold até licenciar
+- Contrail One: Google Fonts (`next/font/google`)
+- Títulos: uppercase ou title-case, sombra sólida preta 2px (estilo cartaz retrô)
+- Corpo: mínimo `text-base` (16px) em mobile
+
+### Elementos visuais da marca
+
+Usar com moderação — decoração, não poluição:
+
+| Elemento | Onde usar |
+|----------|-----------|
+| **Disco de vinil** | loading, empty states, card de música (`SongCard`), favicon |
+| **Girassol** | celebrações (missão concluída, cadastro), cantos de hero |
+| **Microfone vintage** | fluxo de confirmação de música, telão |
+| **Textura retrô** | overlay sutil 5–10% opacidade no fundo bege (`noise/grain`) |
+
+Assets: `/public/brand/` — PNG/SVG com fundo transparente, estilo ilustração da logo.
+
+### Texturas e efeitos
+
+- Fundo bege com grain/noise sutil (CSS ou PNG tile)
+- Sombras duras offset (estilo cartaz): `4px 4px 0 #000` em cards e botões
+- Bordas grossas pretas ou azul escuro (`border-2 border-black`)
+- Evitar: gradientes neon, blur glassmorphism, glow roxo/rosa
+
+## Tokens Tailwind (alvo)
+
+```css
+@theme inline {
+  --color-brega-bege: #FBE6C6;
+  --color-brega-carmim: #D83055;
+  --color-brega-azul: #003C8D;
+  --color-brega-preto: #000000;
+  --font-display: var(--font-zing-rust);
+  --font-body: var(--font-contrail);
+}
+```
+
+## Componentes base
+
+- **Botão primário**: `bg-brega-carmim text-brega-bege font-display uppercase border-2 border-black shadow-[4px_4px_0_#000] active:shadow-none active:translate-x-1 active:translate-y-1`
+- **Botão secundário**: `bg-brega-bege text-brega-azul border-2 border-brega-azul font-body`
+- **Botão confirmação (alvo)**: `bg-brega-azul text-brega-bege border-2 border-black shadow-[4px_4px_0_#000]`
+- **Card**: `bg-brega-bege border-2 border-black rounded-xl shadow-[4px_4px_0_#000]`
+- **Card escuro (telão sidebar)**: `bg-brega-azul text-brega-bege border-2 border-black`
+- **Input**: `bg-white border-2 border-brega-azul rounded-lg px-4 py-3 text-brega-preto focus:border-brega-carmim font-body`
+- **SongCard**: borda carmim, ícone vinil, título em Zing Rust
+- **Nav inferior**: fundo bege, aba ativa carmim com contorno preto
+
+## Contextos de uso
+
+1. **Celular** — participantes caçando, confirmando, feed/ranking
+2. **Telão** (`/live`) — fullscreen, legível a 5–20m; pode usar fundo azul + texto bege para contraste à distância
+
+## Jornadas e telas
+
+### Entrada (`/`, `/e/[code]`)
+- Hero: logo Festa Brega + vinil/girassol decorativos
+- Fundo bege texturizado, título carmim com sombra
+- 2 CTAs: Cadastrar (carmim) / Entrar (outline azul)
+
+### Auth (`/cadastro`, `/login`)
+- Selfie primeiro no cadastro
+- Revelação da música = cartaz animado (vinil girando + título Zing Rust)
+- Formulários claros sobre bege — nunca fundo escuro
+
+### App logado (`/home`, `/missoes`, `/feed`, `/ranking`)
+- Nav fixa inferior, 4 abas
+- `/home`: saudação + SongCard + stats + confirmações pendentes (banner azul)
+- `/missoes`: avatar alvo + status com cor semântica
+- `/feed`: cards estilo polaroid (borda branca grossa, legenda manuscrita Contrail)
+- `/ranking`: caçadores carmim / caçados azul
+
+### Missão (`/missao/[id]`) — tela crítica
+- Stepper retrô: 4 bolinhas estilo vinil
+- Avatar grande do alvo
+- UIs distintas caçador (carmim) vs alvo (azul)
+- Botões enormes, um por vez
+
+### Telão (`/live`)
+- Fundo `#003C8D`, texto `#FBE6C6`
+- Títulos Zing Rust 4xl+
+- Mosaico polaroids + destaque rotativo com legenda
+- Microfone decorativo no header
+- Ranking lateral em cards bege
+
+### Admin (`/admin`)
+- Funcional, paleta reduzida (bege + azul), sem ilustrações
+
+## UX de estados
+
+| Estado | Visual |
+|--------|--------|
+| Loading | vinil girando + "Carregando..." |
+| Vazio | ilustração + copy divertida ("A pista tá esperando o primeiro flash!") |
+| Aguardando | banner bege escuro, borda azul tracejada |
+| Sucesso | girassol + confetti carmim/bege |
+| Erro | card carmim escuro, texto bege |
+
+## Tom de copy (pt-BR)
+
+- "Bora caçar!" / "Achou? Diz tua música!" / "Flash na pista!"
+- Evitar: tom corporativo, inglês desnecessário, texto técnico
+- Legendas brega: itálico Contrail One, tom humorístico/nostálgico
+
+## Acessibilidade
+
+- Contraste: carmim/azul sobre bege ✓ | bege sobre azul (telão) ✓
+- `themeColor: #FBE6C6` (mobile) / `#003C8D` (telão)
+- Touch targets ≥ 44px
+- Ícones + texto nos status (não só cor)
+- Câmera: fallback claro se permissão negada
+
+## O que NÃO fazer
+
+- Paleta roxo/rosa/neon (legado — substituir)
+- Geist Sans como fonte principal
+- Glassmorphism, gradientes cyberpunk
+- Pop-ups no fluxo de missão
+- Múltiplos CTAs competindo
+- Texto longo ou instruções em parágrafo
+- Ilustrações em excesso competindo com fotos
+
+## Checklist antes de entregar UI
+
+- [ ] Paleta bege/carmim/azul/preto aplicada
+- [ ] Zing Rust (títulos) + Contrail One (corpo) carregadas
+- [ ] Textura retrô sutil no fundo
+- [ ] Sombras offset estilo cartaz nos botões/cards
+- [ ] Testado 375px + telão 1920×1080
+- [ ] Fluxo caçador E alvo testados
+- [ ] Copy no tom alegre/nostálgico

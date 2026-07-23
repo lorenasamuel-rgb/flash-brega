@@ -44,13 +44,13 @@ export async function POST(
     }
 
     const rawBuffer = Buffer.from(await file.arrayBuffer());
-    const { buffer, contentType, extension } =
+    const { blob, contentType, extension } =
       await compressImageBuffer(rawBuffer);
     const path = `${mission.event_id}/${id}-${Date.now()}.${extension}`;
 
     const { error: uploadError } = await supabase.storage
       .from("photos")
-      .upload(path, buffer, { contentType, upsert: true });
+      .upload(path, blob, { contentType, upsert: true });
 
     if (uploadError) throw uploadError;
 
