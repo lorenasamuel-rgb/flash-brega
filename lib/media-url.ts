@@ -1,18 +1,17 @@
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+const PHOTOS_PREFIX = "/storage/v1/object/public/photos/";
 
-export function isSupabaseStorageUrl(url: string): boolean {
-  if (!SUPABASE_URL) return false;
-  return (
-    url.startsWith(`${SUPABASE_URL}/storage/v1/object/public/photos/`) ||
-    url.startsWith(`${SUPABASE_URL}/storage/v1/object/sign/photos/`)
-  );
-}
-
-/** Serve Supabase photos through same-origin proxy (avoids browser third-party blocks). */
+/** Convert Supabase storage URL to same-origin path (via next.config rewrite). */
 export function proxiedMediaUrl(
   url: string | null | undefined,
 ): string | null {
   if (!url) return null;
-  if (!isSupabaseStorageUrl(url)) return url;
-  return `/api/media?url=${encodeURIComponent(url)}`;
+
+  const idx = url.indexOf(PHOTOS_PREFIX);
+  if (idx === -1) return url;
+
+  return `/media/photos/${url.slice(idx + PHOTOS_PREFIX.length)}`;
+}
+
+export function isSupabaseStorageUrl(url: string): boolean {
+  return url.includes(PHOTOS_PREFIX);
 }
