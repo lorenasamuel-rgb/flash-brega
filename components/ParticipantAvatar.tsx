@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { proxiedMediaUrl } from "@/lib/media-url";
 
 export function ParticipantAvatar({
   url,
@@ -20,12 +21,13 @@ export function ParticipantAvatar({
   };
 
   const cls = sizes[size];
-  const showImage = url && !failed;
+  const src = proxiedMediaUrl(url);
+  const showImage = src && !failed;
 
   if (showImage) {
     return (
       <img
-        src={url}
+        src={src}
         alt={nickname}
         onError={() => setFailed(true)}
         className={`${cls} shrink-0 rounded-full border-2 border-pink-400 object-cover`}
@@ -52,8 +54,9 @@ export function MissionPhoto({
   className?: string;
 }) {
   const [failed, setFailed] = useState(false);
+  const src = proxiedMediaUrl(url);
 
-  if (!url || failed) {
+  if (!src || failed) {
     return (
       <div className="flex aspect-[4/3] w-full items-center justify-center rounded-xl border border-red-400/30 bg-red-950/30 text-sm text-red-200">
         Foto indisponível
@@ -63,7 +66,7 @@ export function MissionPhoto({
 
   return (
     <img
-      src={url}
+      src={src}
       alt={alt}
       onError={() => setFailed(true)}
       className={className}
