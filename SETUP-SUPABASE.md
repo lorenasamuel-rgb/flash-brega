@@ -30,6 +30,14 @@
      - `http://localhost:3000/auth/callback`
 3. (Opcional) Desative **Confirm email** se quiser — o app já confirma email no cadastro via admin
 
+### Passo 2c — SMTP customizado (obrigatório para a festa)
+
+O email built-in do Supabase Free limita ~4 emails/hora. Com muitos convidados, configure SMTP externo.
+
+**Guia completo:** [`SETUP-SMTP.md`](./SETUP-SMTP.md) (Recomendado: **Resend** + domínio verificado)
+
+Resumo: **Authentication** → **Email** → **Enable Custom SMTP** → host `smtp.resend.com`, user `resend`, password = API key Resend.
+
 ### Conferir se deu certo
 
 No **Table Editor**, você deve ver:
@@ -109,6 +117,7 @@ No painel Vercel → Project → **Settings** → **Environment Variables**, adi
 | Cadastro funciona, foto não sobe | Bucket `photos` deve ser **público** |
 | Cadastro falha após email | Rode `004_auth.sql` (coluna `auth_user_id`) |
 | Link de senha não funciona | Confira `NEXT_PUBLIC_SITE_URL` e redirect URLs no Supabase Auth |
+| Limite de emails / rate limit | Configure SMTP customizado — ver `SETUP-SMTP.md` |
 
 ---
 
@@ -116,6 +125,7 @@ No painel Vercel → Project → **Settings** → **Environment Variables**, adi
 
 ```
 Supabase Dashboard
+├── Authentication      → Email, SMTP, redirect URLs
 ├── SQL Editor          → rodar migrations
 ├── Table Editor        → ver/editar dados
 ├── Storage             → bucket photos

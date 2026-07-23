@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { enrichParticipantsWithEmail } from "@/lib/admin-participants";
 import { generateMissionsForEvent } from "@/lib/missions";
 
 function checkAdmin(request: Request) {
@@ -58,11 +59,13 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: "Evento não encontrado" }, { status: 404 });
     }
 
-    const { data: participants } = await supabase
+    const { data: participantsRaw } = await supabase
       .from("participants")
-      .select("id, nickname, created_at, songs(title, artist)")
+      .select("id, nickname, auth_user_id, created_at, songs(title, artist)")
       .eq("event_id", event.id)
       .order("created_at", { ascending: false });
+
+    const participants = await enrichParticipantsWithEmail(participantsRaw ?? []);
 
     const { data: missions } = await supabase
       .from("missions")

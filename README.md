@@ -11,7 +11,8 @@ PWA de engajamento para festa brega: caça humano com autenticação por música
 1. Crie um projeto em [supabase.com](https://supabase.com)
 2. No SQL Editor, rode as migrations em ordem (`001` → `002` → `003` → `004_auth`) ou use `supabase/setup-completo.sql`
 3. **Authentication** → Email habilitado; redirect URLs: `/auth/callback` (prod + localhost)
-4. Copie URL e keys + `NEXT_PUBLIC_SITE_URL` para `.env.local`
+4. **SMTP customizado** — ver [`SETUP-SMTP.md`](./SETUP-SMTP.md) (evita rate limit na festa)
+5. Copie URL e keys + `NEXT_PUBLIC_SITE_URL` para `.env.local`
 
 ### 2. App
 
@@ -63,6 +64,8 @@ Configure as mesmas env vars no painel da Vercel.
 
 - [ ] Migrations SQL executadas (incl. `004_auth.sql`)
 - [ ] Supabase Auth: Email + redirect URLs configurados
+- [ ] **SMTP customizado** configurado ([SETUP-SMTP.md](./SETUP-SMTP.md))
+- [ ] Teste recuperação de senha com email real
 - [ ] `NEXT_PUBLIC_SITE_URL` no `.env.local` e Vercel
 - [ ] Bucket `photos` criado (público)
 - [ ] `.env.local` / Vercel env vars configuradas

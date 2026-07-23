@@ -2,16 +2,34 @@
 
 import { useState } from "react";
 
+type AdminParticipant = {
+  id: string;
+  nickname: string;
+  email: string | null;
+  songs: { title: string } | null;
+};
+
 export default function AdminPage() {
   const [password, setPassword] = useState("");
   const [authed, setAuthed] = useState(false);
   const [data, setData] = useState<{
     event: { name: string; code: string; ranking_frozen: boolean };
-    participants: { id: string; nickname: string; songs: { title: string } | null }[];
-    encounters: { id: string; caption: string; hidden_from_live: boolean; missions: { hunter: { nickname: string }; target: { nickname: string } } }[];
+    participants: AdminParticipant[];
+    encounters: {
+      id: string;
+      caption: string;
+      hidden_from_live: boolean;
+      missions: { hunter: { nickname: string }; target: { nickname: string } };
+    }[];
     stats: { participants: number; missions: number; byStatus: Record<string, number> };
   } | null>(null);
   const [message, setMessage] = useState("");
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [newUser, setNewUser] = useState({
+    email: "",
+    password: "",
+    nickname: "",
+  });
 
   const headers = { "x-admin-password": password };
 
@@ -20,6 +38,7 @@ export default function AdminPage() {
     if (res.ok) {
       setData(await res.json());
       setAuthed(true);
+      setMessage("");
     } else {
       setMessage("Senha incorreta");
     }
@@ -56,6 +75,50 @@ export default function AdminPage() {
       body: JSON.stringify({ eventCode: "BREGA2026", frozen: true }),
     });
     setMessage("Ranking congelado!");
+    loadAdmin();
+  }
+
+  async function addParticipant(e: React.FormEvent) {
+    e.preventDefault();
+    const res = await fetch("/api/admin/participants", {
+      method: "POST",
+      headers: { ...headers, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        eventCode: "BREGA2026",
+        ...newUser,
+      }),
+    });
+    const result = await res.json();
+    if (!res.ok) {
+      setMessage(result.error ?? "Erro ao adicionar");
+      return;
+    }
+    setMessage(`Participante criado: ${result.participant.nickname}`);
+    setNewUser({ email: "", password: "", nickname: "" });
+    setShowAddForm(false);
+    loadAdmin();
+  }
+
+  async function deleteParticipant(participant: AdminParticipant) {
+    const label = participant.nickname || participant.email || participant.id;
+    if (
+      !window.confirm(
+        `Apagar ${label}? Remove login, missões e fotos desse participante.`,
+      )
+    ) {
+      return;
+    }
+
+    const res = await fetch(`/api/admin/participants/${participant.id}`, {
+      method: "DELETE",
+      headers,
+    });
+    const result = await res.json();
+    if (!res.ok) {
+      setMessage(result.error ?? "Erro ao apagar");
+      return;
+    }
+    setMessage(`Participante ${label} removido.`);
     loadAdmin();
   }
 
@@ -119,6 +182,12 @@ export default function AdminPage() {
         >
           Congelar ranking
         </button>
+        <button
+          onClick={() => setShowAddForm((v) => !v)}
+          className="rounded-xl bg-green-700 px-4 py-2 font-bold text-white"
+        >
+          {showAddForm ? "Cancelar" : "Adicionar usuário"}
+        </button>
         <a
           href="/live?event=BREGA2026"
           target="_blank"
@@ -128,13 +197,73 @@ export default function AdminPage() {
         </a>
       </div>
 
+      {showAddForm && (
+        <form
+          onSubmit={addParticipant}
+          className="mt-4 space-y-3 rounded-xl border border-green-500/30 bg-purple-950/40 p-4"
+        >
+          <p className="text-sm font-bold text-green-300">Novo participante</p>
+          <input
+            type="email"
+            required
+            value={newUser.email}
+            onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+            placeholder="Email"
+            className="w-full rounded-lg border border-purple-500/40 bg-purple-950/50 px-3 py-2 text-white"
+          />
+          <input
+            type="password"
+            required
+            minLength={6}
+            value={newUser.password}
+            onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+            placeholder="Senha (mín. 6)"
+            className="w-full rounded-lg border border-purple-500/40 bg-purple-950/50 px-3 py-2 text-white"
+          />
+          <input
+            required
+            minLength={2}
+            maxLength={30}
+            value={newUser.nickname}
+            onChange={(e) => setNewUser({ ...newUser, nickname: e.target.value })}
+            placeholder="Apelido brega"
+            className="w-full rounded-lg border border-purple-500/40 bg-purple-950/50 px-3 py-2 text-white"
+          />
+          <button
+            type="submit"
+            className="rounded-lg bg-green-600 px-4 py-2 text-sm font-bold text-white"
+          >
+            Criar participante
+          </button>
+          <p className="text-xs text-purple-400">
+            Sem foto de perfil — ideal para contas de teste. Convidados reais devem
+            cadastrar em /cadastro.
+          </p>
+        </form>
+      )}
+
       {message && <p className="mt-4 text-green-300">{message}</p>}
 
       <h2 className="mt-8 font-bold text-white">Participantes</h2>
-      <ul className="mt-2 space-y-1 text-sm text-purple-200">
+      <ul className="mt-2 space-y-2 text-sm text-purple-200">
         {data?.participants.map((p) => (
-          <li key={p.id}>
-            {p.nickname} — {p.songs?.title ?? "sem música"}
+          <li
+            key={p.id}
+            className="flex items-center justify-between gap-3 rounded-lg bg-purple-950/40 p-3"
+          >
+            <div>
+              <p className="font-bold text-white">{p.nickname}</p>
+              <p className="text-xs text-purple-400">
+                {p.email ?? "sem email"} — {p.songs?.title ?? "sem música"}
+              </p>
+            </div>
+            <button
+              onClick={() => deleteParticipant(p)}
+              className="shrink-0 text-xs text-red-300 underline"
+              type="button"
+            >
+              Apagar
+            </button>
           </li>
         ))}
       </ul>
