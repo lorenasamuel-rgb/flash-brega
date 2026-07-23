@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { PhotoCapture } from "./PhotoCapture";
 import { SongCard } from "./SongCard";
-import { ParticipantAvatar } from "./ParticipantAvatar";
+import { MissionPhoto, ParticipantAvatar } from "./ParticipantAvatar";
+import { normalizeMission } from "@/lib/supabase/helpers";
 
 interface MissionData {
   id: string;
@@ -49,7 +50,7 @@ export function MissionFlow({
     const res = await fetch(`/api/missions/${missionId}`);
     if (res.ok) {
       const data = await res.json();
-      setMission(data.mission);
+      setMission(normalizeMission(data.mission) as MissionData);
     }
     setLoading(false);
   }
@@ -147,9 +148,8 @@ export function MissionFlow({
             Missão concluída!
           </p>
           {mission.encounters?.photo_url && (
-            <img
-              src={mission.encounters.photo_url}
-              alt="Flash"
+            <MissionPhoto
+              url={mission.encounters.photo_url}
               className="w-full rounded-xl"
             />
           )}
@@ -233,8 +233,8 @@ export function MissionFlow({
       {mission.status === "photo_pending" && isHunter && (
         <div className="space-y-4">
           {mission.encounters?.photo_url && (
-            <img
-              src={mission.encounters.photo_url}
+            <MissionPhoto
+              url={mission.encounters.photo_url}
               alt="Enviada"
               className="w-full rounded-xl"
             />
@@ -251,8 +251,8 @@ export function MissionFlow({
             {mission.hunter.nickname} enviou este flash com você:
           </p>
           {mission.encounters?.photo_url && (
-            <img
-              src={mission.encounters.photo_url}
+            <MissionPhoto
+              url={mission.encounters.photo_url}
               alt="Flash pendente"
               className="w-full rounded-xl border-2 border-pink-400"
             />

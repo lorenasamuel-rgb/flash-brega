@@ -64,10 +64,10 @@ export async function POST(
 
     if (missionError) throw missionError;
 
-    const { error: encError } = await supabase
-      .from("encounters")
-      .update({ photo_url: photoUrl })
-      .eq("mission_id", id);
+    const { error: encError } = await supabase.from("encounters").upsert(
+      { mission_id: id, photo_url: photoUrl },
+      { onConflict: "mission_id" },
+    );
 
     if (encError) throw encError;
 

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireSession } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { normalizeMission } from "@/lib/supabase/helpers";
 
 export async function GET() {
   try {
@@ -24,8 +25,10 @@ export async function GET() {
       .in("status", ["awaiting_song", "photo_pending"]);
 
     return NextResponse.json({
-      asHunter: asHunter ?? [],
-      pendingConfirmations: pendingAsTarget ?? [],
+      asHunter: (asHunter ?? []).map((m) => normalizeMission(m)),
+      pendingConfirmations: (pendingAsTarget ?? []).map((m) =>
+        normalizeMission(m),
+      ),
     });
   } catch {
     return NextResponse.json({ error: "Não autorizado" }, { status: 401 });

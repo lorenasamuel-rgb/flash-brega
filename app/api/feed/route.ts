@@ -41,16 +41,28 @@ export async function GET(request: Request) {
 
     if (error) throw error;
 
-    let items = data ?? [];
+    let items = (data ?? []).map((item) => {
+      const mission = normalizeRelation(item.missions);
+      if (!mission) return item;
+      return {
+        ...item,
+        missions: {
+          ...mission,
+          hunter: normalizeRelation(mission.hunter),
+          target: normalizeRelation(mission.target),
+        },
+      };
+    });
 
     if (liveOnly) {
       items = items.filter((item) => {
         if (item.hidden_from_live) return false;
-        const mission = normalizeRelation(item.missions);
+        const mission = item.missions as {
+          hunter?: { opt_in_public?: boolean } | null;
+          target?: { opt_in_public?: boolean } | null;
+        } | null;
         if (!mission) return false;
-        const hunter = normalizeRelation(mission.hunter);
-        const target = normalizeRelation(mission.target);
-        return hunter?.opt_in_public && target?.opt_in_public;
+        return mission.hunter?.opt_in_public && mission.target?.opt_in_public;
       });
     }
 

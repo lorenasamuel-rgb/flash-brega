@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { LeaderboardMini } from "./Leaderboard";
+import { MissionPhoto } from "./ParticipantAvatar";
 
 interface FeedItem {
   id: string;
@@ -103,9 +104,8 @@ export function LiveMosaic({ eventCode }: { eventCode: string }) {
                     gridRow: i === 0 && items.length < 5 ? "span 2" : undefined,
                   }}
                 >
-                  <img
-                    src={item.photo_url}
-                    alt=""
+                  <MissionPhoto
+                    url={item.photo_url}
                     className="h-full w-full object-cover"
                   />
                 </div>
@@ -118,9 +118,8 @@ export function LiveMosaic({ eventCode }: { eventCode: string }) {
           {featured && (
             <div className="rounded-2xl border border-yellow-400/40 bg-gradient-to-br from-purple-900 to-pink-900 p-4">
               {featured.photo_url && (
-                <img
-                  src={featured.photo_url}
-                  alt=""
+                <MissionPhoto
+                  url={featured.photo_url}
                   className="mb-3 aspect-video w-full rounded-xl object-cover"
                 />
               )}

@@ -15,3 +15,35 @@ export function normalizeSong(
 ): { title: string; artist: string } | null {
   return normalizeRelation(songs);
 }
+
+export function normalizeParticipant<
+  T extends {
+    songs?:
+      | { title: string; artist: string }
+      | { title: string; artist: string }[]
+      | null;
+  },
+>(participant: T | T[] | null | undefined) {
+  const row = normalizeRelation(participant);
+  if (!row) return null;
+  return { ...row, songs: normalizeSong(row.songs) };
+}
+
+export function normalizeMission<
+  T extends {
+    hunter?: Parameters<typeof normalizeParticipant>[0];
+    target?: Parameters<typeof normalizeParticipant>[0];
+    encounters?:
+      | { photo_url?: string | null; caption?: string | null }
+      | { photo_url?: string | null; caption?: string | null }[]
+      | null;
+  },
+>(mission: T | null | undefined) {
+  if (!mission) return null;
+  return {
+    ...mission,
+    hunter: normalizeParticipant(mission.hunter),
+    target: normalizeParticipant(mission.target),
+    encounters: normalizeRelation(mission.encounters),
+  };
+}

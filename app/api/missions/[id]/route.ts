@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireSession } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { normalizeMission } from "@/lib/supabase/helpers";
 
 export async function GET(
   _request: Request,
@@ -27,7 +28,7 @@ export async function GET(
       return NextResponse.json({ error: "Sem permissão" }, { status: 403 });
     }
 
-    return NextResponse.json({ mission });
+    return NextResponse.json({ mission: normalizeMission(mission) });
   } catch {
     return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
   }

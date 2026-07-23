@@ -1,5 +1,7 @@
 "use client";
 
+import { MissionPhoto } from "./ParticipantAvatar";
+
 interface FeedItem {
   id: string;
   photo_url: string;
@@ -14,9 +16,8 @@ interface FeedItem {
 export function FeedCard({ item }: { item: FeedItem }) {
   return (
     <article className="overflow-hidden rounded-2xl border border-purple-500/30 bg-purple-950/40">
-      <img
-        src={item.photo_url}
-        alt="Flash"
+      <MissionPhoto
+        url={item.photo_url}
         className="aspect-[4/3] w-full object-cover"
       />
       <div className="p-4">
