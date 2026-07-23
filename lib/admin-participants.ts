@@ -1,5 +1,5 @@
 import { createAdminClient } from "./supabase/admin";
-import { assignSongToParticipant } from "./missions";
+import { assignSongToParticipant, assignInitialMissionsForNewParticipant } from "./missions";
 import { normalizeSong } from "./supabase/helpers";
 
 export async function enrichParticipantsWithEmail<
@@ -73,6 +73,7 @@ export async function createParticipantAsAdmin(input: {
   }
 
   await assignSongToParticipant(input.eventId, participant.id);
+  await assignInitialMissionsForNewParticipant(input.eventId, participant.id);
 
   const { data: full } = await admin
     .from("participants")

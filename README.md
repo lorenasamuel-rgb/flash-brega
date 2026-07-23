@@ -39,7 +39,7 @@ Configure as mesmas env vars no painel da Vercel.
 1. **Entrada:** QR code apontando para `/e/BREGA2026`
 2. **Cadastro:** email + senha + apelido + selfie → recebe música brega
 3. **Login / recuperação:** `/login` e `/recuperar-senha`
-4. **Admin:** em `/admin`, gerar missões quando tiver participantes
+4. **Admin:** em `/admin`, gerenciar participantes; missões são **progressivas** (2 iniciais, +2 a cada flash concluído)
 5. **Telão:** notebook em `/live?event=BREGA2026` fullscreen
 6. **Fim:** admin congela ranking → anuncia top caçador e top caçado
 

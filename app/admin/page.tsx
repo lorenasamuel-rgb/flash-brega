@@ -48,12 +48,12 @@ export default function AdminPage() {
     const res = await fetch("/api/admin", {
       method: "POST",
       headers: { ...headers, "Content-Type": "application/json" },
-      body: JSON.stringify({ eventCode: "BREGA2026", targetsPerParticipant: 5 }),
+      body: JSON.stringify({ eventCode: "BREGA2026" }),
     });
     const result = await res.json();
     setMessage(
       res.ok
-        ? `Missões geradas: ${result.created} para ${result.participants} participantes`
+        ? `Missões iniciais: +${result.created} (${result.participants} participantes)`
         : result.error,
     );
     loadAdmin();
@@ -174,7 +174,7 @@ export default function AdminPage() {
           onClick={generateMissions}
           className="rounded-xl bg-pink-600 px-4 py-2 font-bold text-white"
         >
-          Gerar missões
+          Distribuir missões iniciais
         </button>
         <button
           onClick={freezeRanking}

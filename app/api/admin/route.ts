@@ -15,7 +15,7 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json();
-    const { eventCode, targetsPerParticipant = 5 } = body;
+    const { eventCode } = body;
 
     const supabase = createAdminClient();
     const { data: event } = await supabase
@@ -28,7 +28,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Evento não encontrado" }, { status: 404 });
     }
 
-    const result = await generateMissionsForEvent(event.id, targetsPerParticipant);
+    const result = await generateMissionsForEvent(event.id);
     return NextResponse.json(result);
   } catch (err) {
     console.error(err);

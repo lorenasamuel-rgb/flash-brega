@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireSession } from "@/lib/auth";
 import { generateCaption } from "@/lib/captions";
+import { unlockMissionsAfterCompletion } from "@/lib/missions";
 import { normalizeRelation, normalizeSong } from "@/lib/supabase/helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -16,7 +17,7 @@ export async function POST(
     const { data: mission } = await supabase
       .from("missions")
       .select(
-        "id, target_id, status, hunter:participants!missions_hunter_id_fkey(nickname, songs(title)), target:participants!missions_target_id_fkey(nickname, songs(title))",
+        "id, event_id, hunter_id, target_id, status, hunter:participants!missions_hunter_id_fkey(nickname, songs(title)), target:participants!missions_target_id_fkey(nickname, songs(title))",
       )
       .eq("id", id)
       .single();
@@ -72,7 +73,17 @@ export async function POST(
 
     if (encError) throw encError;
 
-    return NextResponse.json({ ok: true, caption, status: "completed" });
+    const unlock = await unlockMissionsAfterCompletion(
+      mission.event_id,
+      mission.hunter_id,
+    );
+
+    return NextResponse.json({
+      ok: true,
+      caption,
+      status: "completed",
+      unlockedMissions: unlock.created,
+    });
   } catch (err) {
     console.error(err);
     return NextResponse.json(

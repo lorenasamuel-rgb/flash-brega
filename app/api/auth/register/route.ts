@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { normalizeSong } from "@/lib/supabase/helpers";
-import { assignSongToParticipant } from "@/lib/missions";
+import { assignSongToParticipant, assignInitialMissionsForNewParticipant } from "@/lib/missions";
 import { compressImageBuffer } from "@/lib/compress-image";
 
 export async function POST(request: Request) {
@@ -114,6 +114,7 @@ export async function POST(request: Request) {
       .eq("id", participant.id);
 
     await assignSongToParticipant(event.id, participant.id);
+    await assignInitialMissionsForNewParticipant(event.id, participant.id);
 
     const supabase = await createClient();
     const { error: signInError } = await supabase.auth.signInWithPassword({
